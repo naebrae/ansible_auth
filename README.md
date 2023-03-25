@@ -1,6 +1,6 @@
 # Ansible linux authentication roles for Active Directory or LDAP
 
-* Include vagrant virtualbox configuration for testing. The vagrant configuration starts and configures two Alpine linux machines to act as a Samaba based Active Directory Domain Controllers.
+* Includes vagrant virtualbox configuration for testing. The vagrant configuration starts and configures two Alpine linux machines to act as Samba Active Directory Domain Controllers.
 
 ## Usage
 
