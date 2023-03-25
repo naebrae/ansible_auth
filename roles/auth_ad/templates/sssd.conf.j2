@@ -1,0 +1,33 @@
+[domain/{{ ad_realm | lower }}]
+debug_level = 2
+auth_provider = ad
+chpass_provider = ad
+id_provider = ad
+access_provider = ad
+
+ldap_user_gecos = displayName
+auto_private_groups = true
+
+cache_credentials = true
+ad_gpo_access_control = disabled
+ad_gpo_ignore_unreadable = true
+case_sensitive = false
+
+dns_resolver_timeout = 30
+ldap_network_timeout = 30
+dyndns_update = false
+
+fallback_homedir = /home/%u
+
+[sssd]
+services = nss, pam, pac
+config_file_version = 2
+debug_level = 2
+domains = {{ ad_realm | lower }}
+
+[nss]
+debug_level = 2
+fallback_homedir = /home/%u
+default_shell = /bin/bash
+filter_users = root
+filter_groups = root

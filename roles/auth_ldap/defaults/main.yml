@@ -1,0 +1,4 @@
+---
+ldapserver: ldap.lab.local
+ldapbase: o=local
+ldapschema: rfc2307bis

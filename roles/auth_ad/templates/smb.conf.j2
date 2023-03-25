@@ -1,0 +1,12 @@
+[global]
+workgroup = {{ ad_workgroup | upper }}
+client signing = yes
+client use spnego = yes
+kerberos method = secrets and keytab
+log file = /var/log/samba/%m.log
+realm = {{ ad_realm | upper }}
+security = ads
+
+printing = bsd
+printcap name = /dev/null
+load printers = no

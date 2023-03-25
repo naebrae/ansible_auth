@@ -1,0 +1,21 @@
+---
+- hosts: linux
+  become: true
+
+  vars_prompt:
+  - name: adpriv_username
+    prompt: "Enter AD Join Username"
+    #default: "Administrator"
+    private: no
+  - name: adpriv_password
+    prompt: "Enter AD Join Password"
+    #default: "Passw0rd"
+    unsafe: yes
+    private: yes
+
+  roles:
+  - common_handlers
+
+  - { role: auth_ad, ad_workgroup: 'AD', ad_realm: 'ad.lab.local', ad_server_ou: 'OU=Servers,DC=ad,DC=lab,DC=local', when: adpriv_username is defined and adpriv_username != "" }
+
+  - { role: auth_ldap, ldapserver: 'ad.lab.local', ldapbase: 'DC=ad,DC=lab,DC=local', ldapschema: 'ad', ldapbinddn: 'cn=ldappxy,cn=users,DC=ad,DC=lab,DC=local', ldapbindpwd: 'Passw0rd', when: adpriv_username is not defined or adpriv_username == "" }

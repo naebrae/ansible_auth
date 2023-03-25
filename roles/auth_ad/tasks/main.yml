@@ -1,0 +1,148 @@
+---
+- block:
+  - name: Enter AD Join Username
+    pause:
+      prompt: "Enter AD Join Username"
+    register: prompt
+    no_log: yes
+    run_once: yes
+  - set_fact:
+      adpriv_username: "{{prompt.user_input}}"
+    no_log: yes
+    run_once: yes
+  when: adpriv_username is not defined or adpriv_username == ""
+  
+- block:
+  - name: Enter AD Join Password
+    pause:
+      prompt: "Enter AD Join Password"
+      echo: no
+    register: prompt
+    no_log: yes
+    run_once: yes
+  - set_fact:
+      adpriv_password: "{{prompt.user_input}}"
+    no_log: yes
+    run_once: yes
+  when: adpriv_password is not defined or adpriv_password == ""
+
+- name: Install Samba on RedHat
+  yum:
+    name:
+    - samba
+    - samba-client
+    - samba-common
+    - adcli
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install Samba on Debian
+  apt:
+    name:
+    - samba
+    - samba-client
+    - samba-common
+    - adcli
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Configure Samba as a domain member
+  template: src=smb.conf.j2 dest=/etc/samba/smb.conf owner=root group=root mode=644
+
+- name: Remove existing krb5.keytab
+  file: path=/etc/krb5.keytab state=absent
+
+- name: Join AD with Samba to generate the keytab
+  shell: echo -n "{{ adpriv_password }}" | /usr/sbin/adcli join --domain="{{ ad_realm }}" --domain-ou="{{ ad_server_ou }}" --os-name="{{ ansible_distribution }}" --os-version="{{ ansible_distribution_major_version }}" --os-service-pack="{{ ansible_distribution_version }}" --login-user="{{ adpriv_username }}" --stdin-password
+  args:
+    creates: /etc/krb5.keytab
+  register: result
+  ignore_errors: true
+  no_log: true
+
+- name: Did AD join fail?
+  fail: msg="{{ result.stderr_lines }}"
+  when: result.rc != 0
+
+- name: Install Kerberos on RedHat
+  yum:
+    name:
+    - krb5-workstation
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install Kerberos on Debian
+  apt:
+    name:
+    - krb5-user
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Configure Kerberos integration with AD
+  template: src=krb5.conf.j2 dest=/etc/krb5.conf owner=root group=root mode=644
+
+- name: Install SSSD on RedHat
+  yum:
+    name:
+    - sssd
+    - oddjob-mkhomedir
+    - authconfig
+    state: present
+  when: ansible_os_family == "RedHat"
+  notify:
+  - restart_sssd
+
+- name: Install SSSD on Debian
+  apt:
+    name:
+    - sssd
+    - oddjob-mkhomedir
+    state: present
+  when: ansible_os_family == "Debian"
+  notify:
+  - restart_sssd
+
+- name: Configure SSSD to use AD for authentication
+  template: src=sssd.conf.j2 dest=/etc/sssd/sssd.conf owner=root group=root mode=0600
+  notify:
+  - restart_sssd
+
+- name: Configure server to use SSSD for authentication using authconfig
+  command: /usr/sbin/authconfig --enablesssd --enablesssdauth --enablemkhomedir --updateall --nostart --update
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7
+  notify:
+  - restart_sssd
+
+- name: Configure server to use SSSD for authentication using authselect
+  command: /bin/authselect select sssd with-mkhomedir --force
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
+  notify:
+  - restart_sssd
+
+- name: Configure mkhomedir on Debian OS family
+  command: /usr/sbin/pam-auth-update --enable mkhomedir
+  when: ansible_os_family == "Debian"
+  notify:
+  - restart_sssd
+
+- name: Ensure SSSD is enabled on boot
+  service: name=sssd enabled=yes
+
+- name: Ensure oddjobd for mkhomedir is started and enabled on boot
+  service: name=oddjobd state=started enabled=yes
+
+- name: Disable nmb
+  service: name=nmb state=stopped enabled=no
+  when: ansible_os_family == "RedHat"
+
+- name: Disable smb
+  service: name=smb state=stopped enabled=no
+  when: ansible_os_family == "RedHat"
+
+- name: Disable nmbd
+  service: name=nmbd state=stopped enabled=no
+  when: ansible_os_family == "Debian"
+
+- name: Disable smbd
+  service: name=smbd state=stopped enabled=no
+  when: ansible_os_family == "Debian"

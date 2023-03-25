@@ -1,0 +1,6 @@
+---
+schema_list:
+  - rfc2307
+  - rfc2307bis
+  - ipa
+  - ad

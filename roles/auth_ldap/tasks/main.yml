@@ -1,0 +1,164 @@
+---
+- name: Install sssd on RedHat
+  yum: name=sssd state=present
+  when: ansible_os_family == "RedHat"
+  notify:
+    - restart_sssd
+
+- name: Install sssd on Debian
+  apt: name=sssd state=present
+  when: ansible_os_family == "Debian"
+  notify:
+    - restart_sssd
+
+- name: Install oddjob-mkhomedir on RedHat
+  yum: name=oddjob-mkhomedir state=present
+  when: ansible_os_family == "RedHat"
+
+- name: Install oddjob-mkhomedir on Debian
+  apt: name=oddjob-mkhomedir state=present
+  when: ansible_os_family == "Debian"
+
+- name: Enable ldap with authconfig
+  command: "/usr/sbin/authconfig --enablemkhomedir --enableldap --enableldapauth --enableldaptls --ldapserver={{ ldapserver }} --ldapbasedn={{ ldapbase }} --update"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7
+  notify:
+    - restart_sssd
+
+- name: Enable ldap in sssd
+  template: src=sssd.conf.j2 dest=/etc/sssd/sssd.conf owner=root group=root mode=0600
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
+  notify:
+    - restart_sssd
+
+- name: Configure server to use SSSD for authentication using authselect
+  command: /bin/authselect select sssd with-mkhomedir --force
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
+  notify:
+    - restart_sssd
+
+- name: Configure sssd ldap on Debian
+  template: src=sssd.conf.j2 dest=/etc/sssd/sssd.conf owner=root group=root mode=0600
+  when: ansible_os_family == "Debian"
+  notify:
+    - restart_sssd
+
+- name: Configure mkhomedir on Debian
+  command: /usr/sbin/pam-auth-update --enable mkhomedir
+  when: ansible_os_family == "Debian"
+  notify:
+    - restart_sssd
+
+- name: Disable SSSD certificate verification
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_tls_reqcert = never'
+    insertafter='^ldap_id_use_start_tls'
+    line='ldap_tls_reqcert = never'
+    state=present
+  notify:
+    - restart_sssd
+
+- name: Disable openldap certificate verification
+  lineinfile: >
+    dest=/etc/openldap/ldap.conf
+    regexp='^TLS_REQCERT never'
+    insertafter='^TLS_CACERTDIR'
+    line='TLS_REQCERT never'
+    state=present
+  when: ansible_os_family == "RedHat"
+  notify:
+    - restart_sssd
+
+- name: remove current ldap_schema
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_schema ='
+    state=absent
+  when: ldapschema is defined and ldapschema != ""
+  notify:
+    - restart_sssd
+
+- name: make ldap_schema = {{ ldapschema }}
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_schema = {{ ldapschema }}'
+    insertafter='^ldap_uri'
+    line='ldap_schema = {{ ldapschema }}'
+    state=present
+  when: ldapschema is defined and ldapschema|lower in schema_list
+  notify:
+    - restart_sssd
+
+- name: remove current ldap_referrals
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_referrals ='
+    state=absent
+  notify:
+    - restart_sssd
+
+- name: make ldap_referrals = false
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_referrals = false'
+    insertafter='^ldap_uri'
+    line='ldap_referrals = false'
+    state=present
+  when: ldapschema is defined and ldapschema|lower == "ad"
+  notify:
+    - restart_sssd
+
+- name: remove current ldap bind dn
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_default_bind_dn ='
+    state=absent
+  when: ldapbinddn is defined and ldapbinddn != ""
+  notify:
+    - restart_sssd
+
+- name: add ldap bind dn
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_default_bind_dn = {{ ldapbinddn }}'
+    insertafter='^ldap_uri'
+    line='ldap_default_bind_dn = {{ ldapbinddn }}'
+    state=present
+  when: ldapbinddn is defined and ldapbinddn != ""
+  notify:
+    - restart_sssd
+
+- name: remove current ldap bind pwd
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_default_authtok ='
+    state=absent
+  when: ldapbindpwd is defined and ldapbindpwd != ""
+  notify:
+    - restart_sssd
+
+- name: add ldap bind pwd
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_default_authtok = {{ ldapbindpwd }}'
+    insertafter='^ldap_uri'
+    line='ldap_default_authtok = {{ ldapbindpwd }}'
+    state=present
+  when: ldapbindpwd is defined and ldapbindpwd != ""
+  notify:
+    - restart_sssd
+
+- name: add ldap bind pwd type
+  lineinfile: >
+    dest=/etc/sssd/sssd.conf
+    regexp='^ldap_default_authtok_type = password'
+    insertafter='^ldap_uri'
+    line='ldap_default_authtok_type = password'
+    state=present
+  when: ldapbindpwd is defined and ldapbindpwd != ""
+  notify:
+    - restart_sssd
+
+- name: Ensure oddjobd for mkhomedir is started and enabled on boot
+  service: name=oddjobd state=started enabled=yes
