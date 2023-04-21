@@ -34,7 +34,7 @@ Vagrant.configure(2) do |config|
     SHELL
   end
 
-  config.vm.define :rh7, autostart: false, primary: true do |rh7_config|
+  config.vm.define :rh7, autostart: false, primary: false do |rh7_config|
     rh7_config.vm.box = "centos/7"
     rh7_config.vm.network "private_network", ip: private_net+".247"
     rh7_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
@@ -82,7 +82,7 @@ Vagrant.configure(2) do |config|
     SHELL
   end
 
-  config.vm.define :rh9, autostart: false, primary: true do |rh9_config|
+  config.vm.define :rh9, autostart: false, primary: false do |rh9_config|
     rh9_config.vm.box = "almalinux/9"
     rh9_config.vm.network "private_network", ip: private_net+".249"
     rh9_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
@@ -106,7 +106,7 @@ Vagrant.configure(2) do |config|
     SHELL
   end
 
-  config.vm.define :deb10, autostart: false do |deb10_config|
+  config.vm.define :deb10, autostart: false, primary: false do |deb10_config|
     deb10_config.vm.box = "debian/buster64"
     deb10_config.vm.network "private_network", ip: private_net+".231"
     deb10_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
@@ -125,7 +125,7 @@ Vagrant.configure(2) do |config|
     SHELL
   end
 
-  config.vm.define :deb11, autostart: false, primary: true do |deb11_config|
+  config.vm.define :deb11, autostart: false, primary: false do |deb11_config|
     deb11_config.vm.box = "debian/bullseye64"
     deb11_config.vm.network "private_network", ip: private_net+".232"
     deb11_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
@@ -144,7 +144,7 @@ Vagrant.configure(2) do |config|
     SHELL
   end
 
-  config.vm.define :ubu18, autostart: false do |ubu18_config|
+  config.vm.define :ubu18, autostart: false, primary: false do |ubu18_config|
     ubu18_config.vm.box = "bento/ubuntu-18.04"
     ubu18_config.vm.network "private_network", ip: private_net+".236"
     ubu18_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
@@ -164,7 +164,7 @@ Vagrant.configure(2) do |config|
     SHELL
   end
 
-  config.vm.define :ubu20, autostart: false do |ubu20_config|
+  config.vm.define :ubu20, autostart: false, primary: false do |ubu20_config|
     ubu20_config.vm.box = "bento/ubuntu-20.04"
     ubu20_config.vm.network "private_network", ip: private_net+".237"
     ubu20_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
@@ -184,7 +184,7 @@ Vagrant.configure(2) do |config|
     SHELL
   end
 
-  config.vm.define :ubu22, autostart: false do |ubu22_config|
+  config.vm.define :ubu22, autostart: false, primary: false do |ubu22_config|
     ubu22_config.vm.box = "bento/ubuntu-22.04"
     ubu22_config.vm.network "private_network", ip: private_net+".238"
     ubu22_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
