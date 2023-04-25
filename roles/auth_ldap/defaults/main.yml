@@ -1,4 +1,4 @@
 ---
-ldapserver: ldap.lab.local
-ldapbase: o=local
+ldapserver: ldap.lab.home
+ldapbase: o=home
 ldapschema: rfc2307bis

@@ -16,8 +16,8 @@ Vagrant.configure(2) do |config|
       dc1_vb.name = "dc1"
     end
     dc1_config.vm.provision "shell", inline: <<-SHELL
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
     SHELL
   end
 
@@ -29,8 +29,8 @@ Vagrant.configure(2) do |config|
       dc2_vb.name = "dc2"
     end
     dc2_config.vm.provision "shell", inline: <<-SHELL
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
     SHELL
   end
 
@@ -43,14 +43,14 @@ Vagrant.configure(2) do |config|
       rh7_vb.memory = "256"
     end
     rh7_config.vm.provision "shell", inline: <<-SHELL
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
       natdev=`ip -o addr show up primary scope global | grep 10.0.2.15 | awk '{print $2}'`
       natif=`nmcli dev show ${natdev} | grep GENERAL.CONNECTION: | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}'`
       nmcli con mod "${natif}" ipv4.addresses 10.0.2.15/24 
       nmcli con mod "${natif}" ipv4.gateway 10.0.2.2
       nmcli con mod "${natif}" ipv4.dns "#{private_dns1} #{private_dns2} 10.0.2.3"
-      nmcli con mod "${natif}" ipv4.dns-search "ad.lab.local lab.local"
+      nmcli con mod "${natif}" ipv4.dns-search "ad.lab.home lab.home"
       nmcli con mod "${natif}" ipv4.method manual
       nmcli con down "${natif}"; nmcli con up "${natif}"
       sed -i "s/^#UseDNS yes/UseDNS no/" /etc/ssh/sshd_config
@@ -67,14 +67,14 @@ Vagrant.configure(2) do |config|
       rh8_vb.memory = "1024"
     end
     rh8_config.vm.provision "shell", inline: <<-SHELL
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
       natdev=`ip -o addr show up primary scope global | grep 10.0.2.15 | awk '{print $2}'`
       natif=`nmcli dev show ${natdev} | grep GENERAL.CONNECTION: | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}'`
       nmcli con mod "${natif}" ipv4.addresses 10.0.2.15/24 
       nmcli con mod "${natif}" ipv4.gateway 10.0.2.2
       nmcli con mod "${natif}" ipv4.dns "#{private_dns1} #{private_dns2} 10.0.2.3"
-      nmcli con mod "${natif}" ipv4.dns-search "ad.lab.local lab.local"
+      nmcli con mod "${natif}" ipv4.dns-search "ad.lab.home lab.home"
       nmcli con mod "${natif}" ipv4.method manual
       nmcli con down "${natif}"; nmcli con up "${natif}"
       sed -i "s/^#UseDNS yes/UseDNS no/" /etc/ssh/sshd_config
@@ -91,14 +91,14 @@ Vagrant.configure(2) do |config|
       rh9_vb.memory = "1024"
     end
     rh9_config.vm.provision "shell", inline: <<-SHELL
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
       natdev=`ip -o addr show up primary scope global | grep 10.0.2.15 | awk '{print $2}'`
       natif=`nmcli dev show ${natdev} | grep GENERAL.CONNECTION: | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}'`
       nmcli con mod "${natif}" ipv4.addresses 10.0.2.15/24
       nmcli con mod "${natif}" ipv4.gateway 10.0.2.2
       nmcli con mod "${natif}" ipv4.dns "#{private_dns1} #{private_dns2} 10.0.2.3"
-      nmcli con mod "${natif}" ipv4.dns-search "ad.lab.local lab.local"
+      nmcli con mod "${natif}" ipv4.dns-search "ad.lab.home lab.home"
       nmcli con mod "${natif}" ipv4.method manual
       nmcli con down "${natif}"; nmcli con up "${natif}"
       sed -i "s/^#UseDNS yes/UseDNS no/" /etc/ssh/sshd_config
@@ -115,10 +115,10 @@ Vagrant.configure(2) do |config|
       deb10_vb.memory = "1024"
     end
     deb10_config.vm.provision "shell", inline: <<-SHELL
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
-      echo "domain lab.local" > /etc/resolv.conf
-      echo "search lab.local ad.lab.local" >> /etc/resolv.conf
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
+      echo "domain lab.home" > /etc/resolv.conf
+      echo "search lab.home ad.lab.home" >> /etc/resolv.conf
       echo "nameserver #{private_dns1}" >> /etc/resolv.conf
       echo "nameserver #{private_dns2}" >> /etc/resolv.conf
       echo "nameserver 10.0.2.3" >> /etc/resolv.conf
@@ -134,10 +134,10 @@ Vagrant.configure(2) do |config|
       deb11_vb.memory = "1024"
     end
     deb11_config.vm.provision "shell", inline: <<-SHELL
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
-      echo "domain lab.local" > /etc/resolv.conf
-      echo "search lab.local ad.lab.local" >> /etc/resolv.conf
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
+      echo "domain lab.home" > /etc/resolv.conf
+      echo "search lab.home ad.lab.home" >> /etc/resolv.conf
       echo "nameserver #{private_dns1}" >> /etc/resolv.conf
       echo "nameserver #{private_dns2}" >> /etc/resolv.conf
       echo "nameserver 10.0.2.3" >> /etc/resolv.conf
@@ -154,10 +154,10 @@ Vagrant.configure(2) do |config|
     end
     ubu18_config.vm.provision "shell", inline: <<-SHELL
       systemctl stop systemd-resolved; systemctl disable systemd-resolved; rm -f /etc/resolv.conf
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
-      echo "domain lab.local" > /etc/resolv.conf
-      echo "search lab.local ad.lab.local" >> /etc/resolv.conf
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
+      echo "domain lab.home" > /etc/resolv.conf
+      echo "search lab.home ad.lab.home" >> /etc/resolv.conf
       echo "nameserver #{private_dns1}" >> /etc/resolv.conf
       echo "nameserver #{private_dns2}" >> /etc/resolv.conf
       echo "nameserver 10.0.2.3" >> /etc/resolv.conf
@@ -174,10 +174,10 @@ Vagrant.configure(2) do |config|
     end
     ubu20_config.vm.provision "shell", inline: <<-SHELL
       systemctl stop systemd-resolved; systemctl disable systemd-resolved; rm -f /etc/resolv.conf
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
-      echo "domain lab.local" > /etc/resolv.conf
-      echo "search lab.local ad.lab.local" >> /etc/resolv.conf
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
+      echo "domain lab.home" > /etc/resolv.conf
+      echo "search lab.home ad.lab.home" >> /etc/resolv.conf
       echo "nameserver #{private_dns1}" >> /etc/resolv.conf
       echo "nameserver #{private_dns2}" >> /etc/resolv.conf
       echo "nameserver 10.0.2.3" >> /etc/resolv.conf
@@ -194,10 +194,10 @@ Vagrant.configure(2) do |config|
     end
     ubu22_config.vm.provision "shell", inline: <<-SHELL
       systemctl stop systemd-resolved; systemctl disable systemd-resolved; rm -f /etc/resolv.conf
-      echo "#{private_net}.251	dc1.ad.lab.local	dc1" >> /etc/hosts
-      echo "#{private_net}.252	dc2.ad.lab.local	dc2" >> /etc/hosts
-      echo "domain lab.local" > /etc/resolv.conf
-      echo "search lab.local ad.lab.local" >> /etc/resolv.conf
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
+      echo "domain lab.home" > /etc/resolv.conf
+      echo "search lab.home ad.lab.home" >> /etc/resolv.conf
       echo "nameserver #{private_dns1}" >> /etc/resolv.conf
       echo "nameserver #{private_dns2}" >> /etc/resolv.conf
       echo "nameserver 10.0.2.3" >> /etc/resolv.conf
@@ -208,7 +208,7 @@ Vagrant.configure(2) do |config|
     ansible.playbook = "playbook.yml"
     ansible.groups = {
        "linux" => ["rh7","rh8","rh9","deb10","deb11","ubu18","ubu20","ubu22"],
-       "linux:vars" => { "hostdomain" => "lab.local" }
+       "linux:vars" => { "hostdomain" => "lab.home" }
     }
     ansible.host_vars = {
        "rh7" => { "hostprivrole" => "priv_rh7_admins" },

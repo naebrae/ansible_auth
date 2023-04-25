@@ -1,4 +1,4 @@
 ---
 ad_workgroup: "ad"
-ad_realm: "ad.lab.local"
-ad_server_ou: "CN=Computers,DC=ad,DC=lab,DC=local"
+ad_realm: "ad.lab.home"
+ad_server_ou: "CN=Computers,DC=ad,DC=lab,DC=home"

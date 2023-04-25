@@ -16,6 +16,6 @@
   roles:
   - common_handlers
 
-  - { role: auth_ad, ad_workgroup: 'AD', ad_realm: 'ad.lab.local', ad_server_ou: 'OU=Servers,DC=ad,DC=lab,DC=local', when: adpriv_username is defined and adpriv_username != "" }
+  - { role: auth_ad, ad_workgroup: 'AD', ad_realm: 'ad.lab.home', ad_server_ou: 'OU=Servers,DC=ad,DC=lab,DC=home', when: adpriv_username is defined and adpriv_username != "" }
 
-  - { role: auth_ldap, ldapserver: 'ad.lab.local', ldapbase: 'DC=ad,DC=lab,DC=local', ldapschema: 'ad', ldapbinddn: 'cn=ldappxy,cn=users,DC=ad,DC=lab,DC=local', ldapbindpwd: 'Passw0rd', when: adpriv_username is not defined or adpriv_username == "" }
+  - { role: auth_ldap, ldapserver: 'ad.lab.home', ldapbase: 'DC=ad,DC=lab,DC=home', ldapschema: 'ad', ldapbinddn: 'cn=ldappxy,cn=users,DC=ad,DC=lab,DC=home', ldapbindpwd: 'Passw0rd', when: adpriv_username is not defined or adpriv_username == "" }
