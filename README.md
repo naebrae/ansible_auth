@@ -2,7 +2,7 @@
 
 * Supports Red Hat family (eg, RHEL, AlmaLinux, Fedora) and Debian family (eg Debian, Ubuntu) machines. It configures SSSD authentication.
 
-* Includes roles to manage pam_access and sudo to limit access.
+* Includes roles to manage ***pam_access*** and ***sudo*** to limit access.
 
 * Includes vagrant virtualbox configuration for testing. The vagrant configuration starts and configures two Alpine linux machines to act as Samba Active Directory Domain Controllers.
 
