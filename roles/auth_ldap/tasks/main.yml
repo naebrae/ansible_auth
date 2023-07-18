@@ -1,23 +1,11 @@
 ---
-- name: Install sssd on RedHat
-  yum: name=sssd state=present
-  when: ansible_os_family == "RedHat"
+- name: Install sssd
+  package: name=sssd state=present
   notify:
     - restart_sssd
 
-- name: Install sssd on Debian
-  apt: name=sssd state=present
-  when: ansible_os_family == "Debian"
-  notify:
-    - restart_sssd
-
-- name: Install oddjob-mkhomedir on RedHat
-  yum: name=oddjob-mkhomedir state=present
-  when: ansible_os_family == "RedHat"
-
-- name: Install oddjob-mkhomedir on Debian
-  apt: name=oddjob-mkhomedir state=present
-  when: ansible_os_family == "Debian"
+- name: Install oddjob-mkhomedir
+  package: name=oddjob-mkhomedir state=present
 
 - name: Enable ldap with authconfig
   command: "/usr/sbin/authconfig --enablemkhomedir --enableldap --enableldapauth --enableldaptls --ldapserver={{ ldapserver }} --ldapbasedn={{ ldapbase }} --update"

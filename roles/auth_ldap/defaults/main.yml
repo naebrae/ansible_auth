@@ -1,4 +1,4 @@
 ---
 ldapserver: ldap.lab.home
 ldapbase: o=home
-ldapschema: rfc2307bis
+ldapschema: rfc2307
