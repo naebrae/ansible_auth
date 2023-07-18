@@ -1,0 +1,29 @@
+---
+- name: Test for Red Hat pam_access
+  command: grep -q "^account.*pam_access" /etc/pam.d/system-auth
+  ignore_errors: True
+  changed_when: False
+  register: pamenabled_redhat
+  when: ansible_os_family == "RedHat"
+
+- name: Copy default access file
+  copy: src=access.conf dest=/etc/security/ mode=0600
+  notify:
+  - authconfig_enable_pam_access
+  - authselect_enable_pam_access
+  when: ansible_os_family == "RedHat" and pamenabled_redhat is failed
+
+- name: Test for Debian pam_access
+  command: grep -q "^account.*pam_access" /etc/pam.d/sshd
+  ignore_errors: True
+  changed_when: False
+  register: pamenabled_debian
+  when: ansible_os_family == "Debian"
+ 
+- name: Copy default access file
+  copy: src=access.conf dest=/etc/security/ mode=0600
+  notify:
+  - uncomment_pam_access_sshd
+  - uncomment_pam_access_login
+  when: ansible_os_family == "Debian" and pamenabled_debian is failed
+

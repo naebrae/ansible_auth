@@ -1,0 +1,8 @@
+---
+- name: Remove group from sudoers.d
+  file: path=/etc/sudoers.d/{{ sudo_access_group | upper }} state=absent
+  when: sudo_access_group is defined
+
+- name: Remove user from sudoers.d
+  file: path=/etc/sudoers.d/{{ sudo_access_user | upper }} state=absent
+  when: sudo_access_user is defined

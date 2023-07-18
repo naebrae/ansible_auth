@@ -1,0 +1,8 @@
+---
+- name: Add {{ pam_access_priv }} to the pam-access file
+  lineinfile: >
+    dest='/etc/security/access.conf'
+    regexp='\+ : {{ pam_access_priv }} : ALL'
+    insertbefore='\- : ALL : ALL'
+    line='+ : {{ pam_access_priv }} : ALL'
+    state=present

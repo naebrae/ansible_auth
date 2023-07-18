@@ -1,0 +1,6 @@
+---
+- name: Remove from the pam-access file
+  lineinfile: >
+    dest='/etc/security/access.conf'
+    regexp='\+ : {{ pam_access_priv }} : ALL'
+    state=absent

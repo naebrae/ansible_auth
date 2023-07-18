@@ -1,0 +1,1 @@
+%{{ sudo_access_group }}	ALL=({{ sudo_access_become }})	{% if sudo_nopasswd is defined %}NOPASSWD:{% endif %}ALL

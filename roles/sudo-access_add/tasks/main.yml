@@ -1,0 +1,18 @@
+---
+- name: Add group {{ sudo_access_group }} to sudoers
+  template: src=sudoers.grp.j2 dest=/etc/sudoers.d/{{ sudo_access_group | upper }} owner=root group=root mode=0440 validate='visudo -cf %s'
+  when: sudo_access_group is defined
+
+- name: Add user {{ sudo_access_user }} to sudoers
+  template: src=sudoers.usr.j2 dest=/etc/sudoers.d/{{ sudo_access_user | upper }} owner=root group=root mode=0440 validate='visudo -cf %s'
+  when: sudo_access_user is defined
+
+  
+- name: Add group {{ sudo_access_group }} ({{ sudo_access_become }}) to sudoers
+  template: src=sudoers.grp.nonroot.j2 dest=/etc/sudoers.d/{{ sudo_access_group | upper }} owner=root group=root mode=0440 validate='visudo -cf %s'
+  when: sudo_access_group is defined and sudo_access_become is defined
+
+- name: Add user {{ sudo_access_user }} ({{ sudo_access_become }}) to sudoers
+  template: src=sudoers.usr.nonroot.j2 dest=/etc/sudoers.d/{{ sudo_access_user | upper }} owner=root group=root mode=0440 validate='visudo -cf %s'
+  when: sudo_access_user is defined and sudo_access_become is defined
+  

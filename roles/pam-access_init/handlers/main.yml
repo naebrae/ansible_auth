@@ -1,0 +1,22 @@
+---
+- name: authconfig_enable_pam_access
+  command: /usr/sbin/authconfig --enablepamaccess --update
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7
+
+- name: authselect_enable_pam_access
+  command: /bin/authselect enable-feature with-pamaccess
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
+
+- name: uncomment_pam_access_sshd
+  replace:
+    path: /etc/pam.d/sshd
+    regexp: '^#\s*(.*pam_access.*)'
+    replace: '\1'
+  when: ansible_os_family == "Debian"
+
+- name: uncomment_pam_access_login
+  replace:
+    path: /etc/pam.d/login
+    regexp: '^#\s*(.*pam_access.*)'
+    replace: '\1'
+  when: ansible_os_family == "Debian"
