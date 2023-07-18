@@ -9,7 +9,7 @@ Vagrant.configure(2) do |config|
   private_dns2 = "#{private_net}.252"
 
   config.vm.define :dc1 do |dc1_config|
-    dc1_config.vm.box = "generic/alpine317"
+    dc1_config.vm.box = "boxomatic/alpine-3.18"
     dc1_config.vm.network "private_network", ip: private_net+".251"
 
     dc1_config.vm.provider "virtualbox" do |dc1_vb|
@@ -22,7 +22,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define :dc2 do |dc2_config|
-    dc2_config.vm.box = "generic/alpine317"
+    dc2_config.vm.box = "boxomatic/alpine-3.18"
     dc2_config.vm.network "private_network", ip: private_net+".252"
 
     dc2_config.vm.provider "virtualbox" do |dc2_vb|
@@ -115,6 +115,7 @@ Vagrant.configure(2) do |config|
       deb10_vb.memory = "1024"
     end
     deb10_config.vm.provision "shell", inline: <<-SHELL
+      echo "#{private_net}.231	deb10.lab.home	deb10" >> /etc/hosts
       echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
       echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
       echo "domain lab.home" > /etc/resolv.conf
@@ -134,6 +135,27 @@ Vagrant.configure(2) do |config|
       deb11_vb.memory = "1024"
     end
     deb11_config.vm.provision "shell", inline: <<-SHELL
+      echo "#{private_net}.232	deb11.lab.home	deb11" >> /etc/hosts
+      echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
+      echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
+      echo "domain lab.home" > /etc/resolv.conf
+      echo "search lab.home ad.lab.home" >> /etc/resolv.conf
+      echo "nameserver #{private_dns1}" >> /etc/resolv.conf
+      echo "nameserver #{private_dns2}" >> /etc/resolv.conf
+      echo "nameserver 10.0.2.3" >> /etc/resolv.conf
+    SHELL
+  end
+
+  config.vm.define :deb12, autostart: false, primary: false do |deb12_config|
+    deb12_config.vm.box = "debian/bookworm64"
+    deb12_config.vm.network "private_network", ip: private_net+".233"
+    deb12_config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
+    deb12_config.vm.provider "virtualbox" do |deb12_vb|
+      deb12_vb.name = "deb12"
+      deb12_vb.memory = "1024"
+    end
+    deb12_config.vm.provision "shell", inline: <<-SHELL
+      echo "#{private_net}.233	deb12.lab.home	deb12" >> /etc/hosts
       echo "#{private_net}.251	dc1.ad.lab.home	dc1" >> /etc/hosts
       echo "#{private_net}.252	dc2.ad.lab.home	dc2" >> /etc/hosts
       echo "domain lab.home" > /etc/resolv.conf
@@ -207,7 +229,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "playbook.yml"
     ansible.groups = {
-       "linux" => ["rh7","rh8","rh9","deb10","deb11","ubu18","ubu20","ubu22"],
+       "linux" => ["rh7","rh8","rh9","deb10","deb11","deb12","ubu18","ubu20","ubu22"],
        "linux:vars" => { "hostdomain" => "lab.home" }
     }
     ansible.host_vars = {
