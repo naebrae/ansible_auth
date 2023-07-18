@@ -51,7 +51,7 @@ Creating home directory for 1001a.
 
 On RedHat machines, pam_access affects 'su'. The example setup restricts access to the group 'linuxusers' which does not include the account '1002B'. The default configuration of pam_access on Debian machines, pam_access is only included in sshd and login:
 ```
-$ su - 1002B
+[vagrant@rh9 ~]$ su - 1002B
 Password:
 su: Permission denied
 ```
