@@ -26,25 +26,14 @@
     run_once: yes
   when: adpriv_password is not defined or adpriv_password == ""
 
-- name: Install Samba on RedHat
-  yum:
+- name: Install Samba
+  package:
     name:
     - samba
     - samba-client
     - samba-common
     - adcli
     state: present
-  when: ansible_os_family == "RedHat"
-
-- name: Install Samba on Debian
-  apt:
-    name:
-    - samba
-    - samba-client
-    - samba-common
-    - adcli
-    state: present
-  when: ansible_os_family == "Debian"
 
 - name: Configure Samba as a domain member
   template: src=smb.conf.j2 dest=/etc/samba/smb.conf owner=root group=root mode=644
@@ -65,14 +54,14 @@
   when: result.rc != 0
 
 - name: Install Kerberos on RedHat
-  yum:
+  package:
     name:
     - krb5-workstation
     state: present
   when: ansible_os_family == "RedHat"
 
 - name: Install Kerberos on Debian
-  apt:
+  package:
     name:
     - krb5-user
     state: present
@@ -81,24 +70,12 @@
 - name: Configure Kerberos integration with AD
   template: src=krb5.conf.j2 dest=/etc/krb5.conf owner=root group=root mode=644
 
-- name: Install SSSD on RedHat
-  yum:
-    name:
-    - sssd
-    - oddjob-mkhomedir
-    - authconfig
-    state: present
-  when: ansible_os_family == "RedHat"
-  notify:
-  - restart_sssd
-
-- name: Install SSSD on Debian
-  apt:
+- name: Install SSSD
+  package:
     name:
     - sssd
     - oddjob-mkhomedir
     state: present
-  when: ansible_os_family == "Debian"
   notify:
   - restart_sssd
 
@@ -107,13 +84,20 @@
   notify:
   - restart_sssd
 
-- name: Configure server to use SSSD for authentication using authconfig
+- name: Install authconfig on RedHat
+  package:
+    name:
+    - authconfig
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Configure RedHat to use SSSD for authentication using authconfig
   command: /usr/sbin/authconfig --enablesssd --enablesssdauth --enablemkhomedir --updateall --nostart --update
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7
   notify:
   - restart_sssd
 
-- name: Configure server to use SSSD for authentication using authselect
+- name: Configure RedHat to use SSSD for authentication using authselect
   command: /bin/authselect select sssd with-mkhomedir --force
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8
   notify:
