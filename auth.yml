@@ -16,6 +16,33 @@
   roles:
   - common_handlers
 
+  # auth_ad role will ask for the privilged account needed to added the computer to AD if not provided.
   - { role: auth_ad, ad_workgroup: 'AD', ad_realm: 'ad.lab.home', ad_server_ou: 'OU=Servers,DC=ad,DC=lab,DC=home', when: adpriv_username is defined and adpriv_username != "" }
 
+  # For Anonymous binds, leave ldapbinddn and ldapbindpwd undefinded. ldapschema can be rfc2307, rfc2307bis, ipa, or ad.
   - { role: auth_ldap, ldapserver: 'ad.lab.home', ldapbase: 'DC=ad,DC=lab,DC=home', ldapschema: 'ad', ldapbinddn: 'cn=ldappxy,cn=users,DC=ad,DC=lab,DC=home', ldapbindpwd: 'Passw0rd', when: adpriv_username is not defined or adpriv_username == "" }
+
+  # Write basic /etc/security/access.conf and install pam_access
+  - pam-access_init
+
+  # Make sure vagrant still has access. Only required in the example.
+  - { role: pam-access_add, pam_access_priv: 'vagrant' }
+
+  # Restrict access to sysadmins and linuxusers
+  - { role: pam-access_add, pam_access_priv: 'sysadmins' }
+  - { role: pam-access_add, pam_access_priv: 'linuxusers' }
+
+  # Provide sysadmins with 'no password' sudo access.
+  - { role: sudo-access_add, sudo_access_group: 'sysadmins', sudo_nopasswd: }
+  # Allow linuxusers sudo access but require password.
+  - { role: sudo-access_add, sudo_access_group: 'linuxusers' }
+
+  # Keep vagrant sudo access.
+  - { role: sudo-access_add, sudo_access_user: 'vagrant', sudo_nopasswd: }
+
+  # Allow user1 to run commands as vagrant (eg. sudo -u vagrant -s)
+  - { role: sudo-access_add, sudo_access_user: 'user1', sudo_access_become: 'vagrant', sudo_nopasswd: }
+
+  # Add role defined in inventory file.
+  - { role: pam-access_add, pam_access_priv: '{{ hostprivrole }}', when: hostprivrole is defined }
+  - { role: sudo-access_add, sudo_access_group: '{{ hostprivrole }}', when: hostprivrole is defined }
