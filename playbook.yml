@@ -77,13 +77,34 @@
 
   - shell: samba-tool user create ldappxy Passw0rd --given-name="LDAP" --surname="Proxy" --use-username-as-cn
 
-  - shell: samba-tool group add linuxusers --gid-number=20000 --nis-domain=AD --groupou="ou=Groups"
-  - shell: samba-tool user create user1 Passw0rd --given-name="User" --surname="One" --use-username-as-cn --uid=user1 --uid-number=10001 --gid-number=20000 --unix-home=/home/user1 --gecos="User One" --login-shell=/bin/bash --nis-domain=AD --userou="ou=Accounts"
-  - shell: samba-tool user create user2 Passw0rd --given-name="User" --surname="Two" --use-username-as-cn --uid=user2 --uid-number=10002 --gid-number=20000 --unix-home=/home/user2 --gecos="User Two" --login-shell=/bin/bash --nis-domain=AD --userou="ou=Accounts" 
+  - shell: samba-tool group add linuxusers --gid-number=2000 --nis-domain=AD --groupou="ou=Groups"
+
+  - shell: samba-tool user create user1 Passw0rd --given-name="User" --surname="One" --use-username-as-cn --mail-address="user1@lab.home" --uid=user1 --uid-number=3001 --gid-number=2000 --unix-home=/home/user1 --gecos="User One" --login-shell=/bin/bash --nis-domain=AD --userou="ou=Accounts"
+  - shell: samba-tool user create user2 Passw0rd --given-name="User" --surname="Two" --use-username-as-cn --mail-address="user2@lab.home" --uid=user2 --uid-number=3002 --gid-number=2000 --unix-home=/home/user2 --gecos="User Two" --login-shell=/bin/bash --nis-domain=AD --userou="ou=Accounts"
+
   - shell: samba-tool group addmembers linuxusers user1,user2
 
   - shell: samba-tool user create user3 Password1 --must-change-at-next-login --given-name="User" --surname="Three" --use-username-as-cn --mail-address="user3@lab.home" --userou="ou=Accounts"
   - shell: samba-tool user create user4 Password1 --must-change-at-next-login --given-name="User" --surname="Four" --use-username-as-cn --mail-address="user4@lab.home" --userou="ou=Accounts"
+
+  - shell: samba-tool group add sysadmins --gid-number=2001 --nis-domain=AD --groupou="ou=Groups"
+  - shell: samba-tool group add internals --gid-number=10001 --nis-domain=AD --groupou="ou=Groups"
+  - shell: samba-tool group add externals --gid-number=20001 --nis-domain=AD --groupou="ou=Groups"
+
+  - shell: samba-tool user create sysadm Passw0rd --given-name="System" --surname="Admin" --use-username-as-cn --uid=sysadm --uid-number=2001 --gid-number=2001 --unix-home=/home/sysadm --gecos="System Admin" --login-shell=/bin/bash --nis-domain=AD --mail-address="system.admin@lab.home" --userou="ou=Accounts"
+  - shell: samba-tool group addmembers sysadmins sysadm
+
+  - shell: samba-tool user create 1001A Passw0rd --given-name="Internal" --surname="One" --use-username-as-cn --uid=1001A --uid-number=10001 --gid-number=10001 --unix-home=/home/1001A --gecos="Internal One" --login-shell=/bin/bash --nis-domain=AD --mail-address="internal.one@lab.home" --userou="ou=Accounts"
+  - shell: samba-tool user create 1002B Passw0rd --given-name="Internal" --surname="Two" --use-username-as-cn --uid=1002B --uid-number=10002 --gid-number=10001 --unix-home=/home/1002B --gecos="Internal Two" --login-shell=/bin/bash --nis-domain=AD --mail-address="internal.two@lab.home" --userou="ou=Accounts"
+
+  - shell: samba-tool group addmembers internals 1001A,1002B
+  - shell: samba-tool group addmembers linuxusers 1001A
+
+  - shell: samba-tool user create 20001 Passw0rd --given-name="External" --surname="One" --use-username-as-cn --uid=20001 --uid-number=20001 --gid-number=20001 --unix-home=/home/20001 --gecos="External One" --login-shell=/bin/bash --nis-domain=AD --mail-address="external.one@lab.home" --userou="ou=Accounts"
+  - shell: samba-tool user create 20002 Passw0rd --given-name="External" --surname="Two" --use-username-as-cn --uid=20002 --uid-number=20002 --gid-number=20001 --unix-home=/home/20002 --gecos="External Two" --login-shell=/bin/bash --nis-domain=AD --mail-address="external.two@lab.home" --userou="ou=Accounts"
+
+  - shell: samba-tool group addmembers externals 20001,20002
+  - shell: samba-tool group addmembers linuxusers 20001
 
 - hosts: dc2
   gather_facts: true
